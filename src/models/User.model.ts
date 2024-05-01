@@ -7,8 +7,9 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Event } from './event.model';
-import { EventVisitor } from './eventVisitor.model';
+
+import { EventVisitor } from './EventVisitor.model';
+import { Events } from './Events.model';
 
 @Entity()
 @ObjectType()
@@ -45,9 +46,9 @@ export class User {
   @Field()
   updatedAt: string;
 
-  @OneToMany(() => Event, (event) => event.organizer)
-  @Field(() => [Event], { nullable: true })
-  events?: Event[];
+  @OneToMany(() => Events, (eventObj) => eventObj.organizer)
+  @Field(() => [Events], { nullable: true })
+  events?: Events[];
 
   @OneToMany(() => EventVisitor, (eventVisitor) => eventVisitor.visitor)
   @Field(() => [EventVisitor], { nullable: true })

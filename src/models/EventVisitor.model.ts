@@ -7,8 +7,8 @@ import {
   UpdateDateColumn,
   ManyToOne,
 } from 'typeorm';
-import { Event } from './event.model';
-import { User } from './user.model';
+import { Events } from './Events.model';
+import { User } from './User.model';
 
 @Entity()
 @ObjectType()
@@ -21,9 +21,9 @@ export class EventVisitor {
   @Field()
   QR_code: string;
 
-  @ManyToOne(() => Event, (event) => event.eventVisitors)
-  @Field((type) => Event)
-  event: Event;
+  @ManyToOne(() => Events, (eventObj) => eventObj.eventVisitors)
+  @Field((type) => Events)
+  events: Events;
 
   @ManyToOne(() => User, (user) => user.eventVisitors)
   @Field((type) => User)

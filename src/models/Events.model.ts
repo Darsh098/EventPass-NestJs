@@ -8,12 +8,12 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { User } from './user.model';
-import { EventVisitor } from './eventVisitor.model';
+import { EventVisitor } from './EventVisitor.model';
+import { User } from './User.model';
 
 @Entity()
 @ObjectType()
-export class Event {
+export class Events {
   @PrimaryGeneratedColumn()
   @Field((type) => Int)
   id: number;
@@ -54,10 +54,6 @@ export class Event {
   @Field({ nullable: true })
   photo?: string;
 
-  @Column({ default: true })
-  @Field()
-  isActive: boolean;
-
   @CreateDateColumn({ type: 'timestamp' })
   @Field()
   createdAt: string;
@@ -66,7 +62,11 @@ export class Event {
   @Field()
   updatedAt: string;
 
-  @OneToMany(() => EventVisitor, (eventVisitor) => eventVisitor.event)
+  @OneToMany(() => EventVisitor, (eventVisitor) => eventVisitor.events)
   @Field(() => [EventVisitor], { nullable: true })
   eventVisitors?: EventVisitor[];
+
+  @Column({ default: true })
+  @Field()
+  isExpired: boolean;
 }
