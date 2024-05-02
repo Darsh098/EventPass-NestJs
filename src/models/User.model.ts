@@ -26,23 +26,27 @@ export class User {
   @Field()
   lastName: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  profilePhoto?: string;
+  @Column()
+  @Field()
+  clerkId: string;
 
   @Column({ unique: true })
   @Field()
-  username: string;
+  email: string;
+
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  profilePhoto?: string;
 
   @Column({ nullable: true })
   @Field({ nullable: true })
   mobileNumber?: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn()
   @Field()
   createdAt: string;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn()
   @Field()
   updatedAt: string;
 

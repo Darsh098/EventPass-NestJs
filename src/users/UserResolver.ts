@@ -16,19 +16,26 @@ export class UserResolver {
     return await this.userService.findUserById(id);
   }
 
+  @Query((returns) => User, { name: 'getUserByClerkId' })
+  async getUserByClerkId(@Args('clerkId') clerkId: string) {
+    return await this.userService.findUserByClerkId(clerkId);
+  }
+
   @Mutation((returns) => User, { name: 'createUser' })
   async createUser(
     @Args('firstName') firstName: string,
     @Args('lastName') lastName: string,
+    @Args('clerkId') clerkId: string,
+    @Args('email') email: string,
     @Args('profilePhoto', { nullable: true }) profilePhoto: string,
-    @Args('username') username: string,
     @Args('mobileNumber', { nullable: true }) mobileNumber: string,
   ) {
     return await this.userService.createUser(
       firstName,
       lastName,
+      clerkId,
+      email,
       profilePhoto,
-      username,
       mobileNumber,
     );
   }
@@ -36,8 +43,9 @@ export class UserResolver {
   @Mutation((returns) => User, { name: 'updateUser' })
   async updateUser(
     @Args('id', { type: () => Int }) id: number,
-    @Args('firstName', { nullable: true }) firstName: string,
-    @Args('lastName', { nullable: true }) lastName: string,
+    @Args('firstName') firstName: string,
+    @Args('lastName') lastName: string,
+    @Args('email') email: string,
     @Args('profilePhoto', { nullable: true }) profilePhoto: string,
     @Args('mobileNumber', { nullable: true }) mobileNumber: string,
   ) {
@@ -45,6 +53,7 @@ export class UserResolver {
       id,
       firstName,
       lastName,
+      email,
       profilePhoto,
       mobileNumber,
     );

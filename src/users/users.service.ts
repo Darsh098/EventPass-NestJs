@@ -18,18 +18,29 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { id } });
   }
 
+  async findUserByClerkId(clerkId: string) {
+    return await this.userRepository.findOne({ where: { clerkId } });
+  }
+
   async createUser(
     firstName: string,
     lastName: string,
+    clerkId: string,
+    email: string,
     profilePhoto: string,
-    username: string,
     mobileNumber: string,
   ) {
+    let existingUser = await this.findUserByClerkId(clerkId);
+    if (existingUser) {
+      return existingUser;
+    }
+
     const newUser = this.userRepository.create({
       firstName,
       lastName,
+      clerkId,
+      email,
       profilePhoto,
-      username,
       mobileNumber,
     });
     return await this.userRepository.save(newUser);
@@ -39,6 +50,7 @@ export class UsersService {
     id: number,
     firstName: string,
     lastName: string,
+    email: string,
     profilePhoto: string,
     mobileNumber: string,
   ) {
@@ -48,6 +60,7 @@ export class UsersService {
     }
     userToUpdate.firstName = firstName;
     userToUpdate.lastName = lastName;
+    userToUpdate.email = email;
     userToUpdate.profilePhoto = profilePhoto;
     userToUpdate.mobileNumber = mobileNumber;
     return await this.userRepository.save(userToUpdate);
