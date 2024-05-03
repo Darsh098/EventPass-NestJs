@@ -22,6 +22,13 @@ export class EventsService {
     return await this.eventRepository.findOne({ where: { id } });
   }
 
+  async findEventsByOrganizerClerkId(clerkId: string) {
+    return await this.eventRepository.find({
+      where: { organizer: { clerkId } },
+      relations: ['organizer'],
+    });
+  }
+
   async createEvent(
     name: string,
     description: string,
@@ -104,7 +111,7 @@ export class EventsService {
           clerkId: clerkId,
         },
       },
-      relations: ['visitor', 'events'],
+      relations: ['visitor', 'events', 'events.organizer'],
     });
   }
 

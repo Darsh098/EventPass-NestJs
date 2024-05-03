@@ -22,6 +22,11 @@ export class EventResolver {
     return await this.eventService.findEventById(id);
   }
 
+  @Query((returns) => [Events], { name: 'getEventsByOrganizerClerkId' })
+  async getEventsByOrganizerClerkId(@Args('clerkId') clerkId: string) {
+    return await this.eventService.findEventsByOrganizerClerkId(clerkId);
+  }
+
   // Mutations For Events Model
   @Mutation((returns) => Events, { name: 'createEvent' })
   async createEvent(
