@@ -18,6 +18,10 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { id } });
   }
 
+  async findUserByEmail(email: string) {
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
   async findUserByClerkId(clerkId: string) {
     return await this.userRepository.findOne({ where: { clerkId } });
   }

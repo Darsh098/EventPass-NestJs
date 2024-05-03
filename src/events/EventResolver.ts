@@ -32,12 +32,14 @@ export class EventResolver {
     @Args('startTime') startTime: string,
     @Args('endTime') endTime: string,
     @Args('timeDuration', { type: () => Int }) timeDuration: number,
-    @Args('organizerId', { type: () => Int }) organizerId: number,
+    @Args('entriesCount', { type: () => Int }) entriesCount: number,
+    @Args('organizerClerkId') organizerClerkId: string,
     @Args('photo', { nullable: true }) photo: string,
   ) {
-    const organizer = await this.usersService.findUserById(organizerId);
+    const organizer =
+      await this.usersService.findUserByClerkId(organizerClerkId);
     if (!organizer) {
-      throw new Error(`Organizer with ID ${organizerId} not found`);
+      throw new Error(`Organizer with ID ${organizerClerkId} not found`);
     }
     return await this.eventService.createEvent(
       name,
@@ -47,6 +49,7 @@ export class EventResolver {
       startTime,
       endTime,
       timeDuration,
+      entriesCount,
       organizer,
       photo,
     );
@@ -63,6 +66,7 @@ export class EventResolver {
     @Args('endTime', { nullable: true }) endTime: string,
     @Args('timeDuration', { type: () => Int, nullable: true })
     timeDuration: number,
+    @Args('entriesCount', { type: () => Int }) entriesCount: number,
     @Args('photo', { nullable: true }) photo: string,
   ) {
     return await this.eventService.updateEvent(
@@ -74,6 +78,7 @@ export class EventResolver {
       startTime,
       endTime,
       timeDuration,
+      entriesCount,
       photo,
     );
   }
@@ -94,40 +99,38 @@ export class EventResolver {
     return await this.eventService.findEventVisitorById(id);
   }
 
+  @Query((returns) => [EventVisitor], { name: 'getEventVisitorByUserClerkId' })
+  async getEventVisitorByUserClerkId(@Args('clerkId') clerkId: string) {
+    const eventVisitor =
+      await this.eventService.findEventVisitorByUserClerkId(clerkId);
+    if (!eventVisitor) {
+      throw new Error('Event visitor not found');
+    }
+    return eventVisitor;
+  }
+
   // Mutations For EventVisitor Model
   @Mutation((returns) => EventVisitor, { name: 'createEventVisitor' })
   async createEventVisitor(
     @Args('QR_code') QR_code: string,
     @Args('eventId', { type: () => Int }) eventId: number,
-    @Args('visitorId', { type: () => Int }) visitorId: number,
-    @Args('entriesCount', { type: () => Int }) entriesCount: number,
+    @Args('email') email: string,
   ) {
     // Retrieve event and visitor objects from their IDs
     const event = await this.eventService.findEventById(eventId);
-    const visitor = await this.usersService.findUserById(visitorId);
+    const visitor = await this.usersService.findUserByEmail(email);
     if (!event || !visitor) {
       throw new Error('Event or visitor not found');
     }
-    return await this.eventService.createEventVisitor(
-      QR_code,
-      event,
-      visitor,
-      entriesCount,
-    );
+    return await this.eventService.createEventVisitor(QR_code, event, visitor);
   }
 
   @Mutation((returns) => EventVisitor, { name: 'updateEventVisitor' })
   async updateEventVisitor(
     @Args('id', { type: () => Int }) id: number,
     @Args('QR_code', { nullable: true }) QR_code: string,
-    @Args('entriesCount', { type: () => Int, nullable: true })
-    entriesCount: number,
   ) {
-    return await this.eventService.updateEventVisitor(
-      id,
-      QR_code,
-      entriesCount,
-    );
+    return await this.eventService.updateEventVisitor(id, QR_code);
   }
 
   @Mutation((returns) => Boolean, { name: 'deleteEventVisitor' })

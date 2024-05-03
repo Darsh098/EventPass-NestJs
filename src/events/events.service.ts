@@ -15,7 +15,7 @@ export class EventsService {
   ) {}
 
   async findAllEvents() {
-    return await this.eventRepository.find();
+    return await this.eventRepository.find({ relations: ['organizer'] });
   }
 
   async findEventById(id: number) {
@@ -30,6 +30,7 @@ export class EventsService {
     startTime: string,
     endTime: string,
     timeDuration: number,
+    entriesCount: number,
     organizer: User,
     photo: string,
   ) {
@@ -41,6 +42,7 @@ export class EventsService {
       startTime,
       endTime,
       timeDuration,
+      entriesCount,
       organizer,
       photo,
     });
@@ -56,6 +58,7 @@ export class EventsService {
     startTime: string,
     endTime: string,
     timeDuration: number,
+    entriesCount: number,
     photo: string,
   ) {
     const eventToUpdate = await this.eventRepository.findOne({ where: { id } });
@@ -69,6 +72,7 @@ export class EventsService {
     eventToUpdate.startTime = startTime ?? eventToUpdate.startTime;
     eventToUpdate.endTime = endTime ?? eventToUpdate.endTime;
     eventToUpdate.timeDuration = timeDuration ?? eventToUpdate.timeDuration;
+    eventToUpdate.entriesCount = entriesCount ?? eventToUpdate.entriesCount;
     eventToUpdate.photo = photo ?? eventToUpdate.photo;
     return await this.eventRepository.save(eventToUpdate);
   }
@@ -87,25 +91,33 @@ export class EventsService {
   }
 
   async findEventVisitorById(id: number) {
-    return await this.eventVisitorRepository.findOne({ where: { id } });
+    return await this.eventVisitorRepository.findOne({
+      where: { id },
+      relations: ['visitor', 'events', 'events.organizer'],
+    });
   }
 
-  async createEventVisitor(
-    QR_code: string,
-    event: Events,
-    visitor: User,
-    entriesCount: number,
-  ) {
+  async findEventVisitorByUserClerkId(clerkId: string) {
+    return await this.eventVisitorRepository.find({
+      where: {
+        visitor: {
+          clerkId: clerkId,
+        },
+      },
+      relations: ['visitor', 'events'],
+    });
+  }
+
+  async createEventVisitor(QR_code: string, event: Events, visitor: User) {
     const newEventVisitor = this.eventVisitorRepository.create({
       QR_code,
       events: event,
       visitor,
-      entriesCount,
     });
     return await this.eventVisitorRepository.save(newEventVisitor);
   }
 
-  async updateEventVisitor(id: number, QR_code: string, entriesCount: number) {
+  async updateEventVisitor(id: number, QR_code: string) {
     const eventVisitorToUpdate = await this.eventVisitorRepository.findOne({
       where: { id },
     });
@@ -113,8 +125,6 @@ export class EventsService {
       throw new Error('Event visitor not found');
     }
     eventVisitorToUpdate.QR_code = QR_code ?? eventVisitorToUpdate.QR_code;
-    eventVisitorToUpdate.entriesCount =
-      entriesCount ?? eventVisitorToUpdate.entriesCount;
     return await this.eventVisitorRepository.save(eventVisitorToUpdate);
   }
 

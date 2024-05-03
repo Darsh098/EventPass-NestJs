@@ -29,10 +29,6 @@ export class EventVisitor {
   @Field((type) => User)
   visitor: User;
 
-  @Column()
-  @Field((type) => Int)
-  entriesCount: number;
-
   @CreateDateColumn({ type: 'timestamp' })
   @Field()
   createdAt: string;

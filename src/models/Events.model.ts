@@ -46,6 +46,10 @@ export class Events {
   @Field((type) => Int, { nullable: true })
   timeDuration?: number;
 
+  @Column()
+  @Field((type) => Int)
+  entriesCount: number;
+
   @ManyToOne(() => User, (user) => user.events)
   @Field((type) => User)
   organizer: User;
