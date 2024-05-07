@@ -84,6 +84,26 @@ export class EventsService {
     return await this.eventRepository.save(eventToUpdate);
   }
 
+  async updateEventExpiredStatus(id: number, isExpired: boolean) {
+    const event = await this.eventRepository.findOne({ where: { id } });
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    event.isExpired = isExpired;
+    return this.eventRepository.save(event);
+  }
+
+  async updateEntriesCount(id: number, entriesCount: number) {
+    const event = await this.eventRepository.findOne({ where: { id } });
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    event.entriesCount = entriesCount;
+    return this.eventRepository.save(event);
+  }
+
   async deleteEvent(id: number) {
     const eventToDelete = await this.eventRepository.findOne({ where: { id } });
     if (!eventToDelete) {

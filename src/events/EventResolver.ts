@@ -88,6 +88,22 @@ export class EventResolver {
     );
   }
 
+  @Mutation(() => Events)
+  async updateEventExpiredStatus(
+    @Args('id', { type: () => Int }) id: number,
+    @Args('isExpired', { type: () => Boolean }) isExpired: boolean,
+  ) {
+    return this.eventService.updateEventExpiredStatus(id, isExpired);
+  }
+
+  @Mutation(() => Events)
+  async updateEntriesCount(
+    @Args('id', { type: () => Int }) id: number,
+    @Args('entriesCount', { type: () => Int }) entriesCount: number,
+  ) {
+    return this.eventService.updateEntriesCount(id, entriesCount);
+  }
+
   @Mutation((returns) => Boolean, { name: 'deleteEvent' })
   async deleteEvent(@Args('id', { type: () => Int }) id: number) {
     return await this.eventService.deleteEvent(id);

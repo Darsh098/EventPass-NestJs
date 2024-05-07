@@ -70,7 +70,7 @@ export class Events {
   @Field(() => [EventVisitor], { nullable: true })
   eventVisitors?: EventVisitor[];
 
-  @Column({ default: true })
+  @Column({ default: false })
   @Field()
   isExpired: boolean;
 }
