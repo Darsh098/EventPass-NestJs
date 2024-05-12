@@ -17,9 +17,9 @@ export class EventVisitor {
   @Field((type) => Int)
   id: number;
 
-  @Column()
-  @Field()
-  QR_code: string;
+  @Column({ default: 0 })
+  @Field((type) => Int)
+  scanned: number;
 
   @ManyToOne(() => Events, (eventObj) => eventObj.eventVisitors)
   @Field((type) => Events)

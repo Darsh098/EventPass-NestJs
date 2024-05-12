@@ -71,8 +71,8 @@ export class EventResolver {
     @Args('endTime', { nullable: true }) endTime: string,
     @Args('timeDuration', { type: () => Int, nullable: true })
     timeDuration: number,
-    @Args('entriesCount', { type: () => Int }) entriesCount: number,
-    @Args('photo', { nullable: true }) photo: string,
+    @Args('entriesCount', { type: () => Int, nullable: true })
+    entriesCount: number,
   ) {
     return await this.eventService.updateEvent(
       id,
@@ -84,7 +84,6 @@ export class EventResolver {
       endTime,
       timeDuration,
       entriesCount,
-      photo,
     );
   }
 
@@ -133,7 +132,6 @@ export class EventResolver {
   // Mutations For EventVisitor Model
   @Mutation((returns) => EventVisitor, { name: 'createEventVisitor' })
   async createEventVisitor(
-    @Args('QR_code') QR_code: string,
     @Args('eventId', { type: () => Int }) eventId: number,
     @Args('email') email: string,
   ) {
@@ -143,19 +141,22 @@ export class EventResolver {
     if (!event || !visitor) {
       throw new Error('Event or visitor not found');
     }
-    return await this.eventService.createEventVisitor(QR_code, event, visitor);
+    return await this.eventService.createEventVisitor(event, visitor);
   }
 
   @Mutation((returns) => EventVisitor, { name: 'updateEventVisitor' })
   async updateEventVisitor(
     @Args('id', { type: () => Int }) id: number,
-    @Args('QR_code', { nullable: true }) QR_code: string,
+    @Args('scanned', { type: () => Int }) scanned: number,
   ) {
-    return await this.eventService.updateEventVisitor(id, QR_code);
+    return await this.eventService.updateEventVisitor(id, scanned);
   }
 
   @Mutation((returns) => Boolean, { name: 'deleteEventVisitor' })
-  async deleteEventVisitor(@Args('id', { type: () => Int }) id: number) {
-    return await this.eventService.deleteEventVisitor(id);
+  async deleteEventVisitor(
+    @Args('id', { type: () => Int }) id: number,
+    @Args('email') email: string,
+  ) {
+    return await this.eventService.deleteEventVisitor(id, email);
   }
 }

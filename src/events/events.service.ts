@@ -12,6 +12,8 @@ export class EventsService {
     private readonly eventRepository: Repository<Events>,
     @InjectRepository(EventVisitor)
     private readonly eventVisitorRepository: Repository<EventVisitor>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async findAllEvents() {
@@ -25,7 +27,7 @@ export class EventsService {
   async findEventsByOrganizerClerkId(clerkId: string) {
     return await this.eventRepository.find({
       where: { organizer: { clerkId } },
-      relations: ['organizer'],
+      relations: ['organizer', 'eventVisitors', 'eventVisitors.visitor'],
     });
   }
 
@@ -66,7 +68,6 @@ export class EventsService {
     endTime: string,
     timeDuration: number,
     entriesCount: number,
-    photo: string,
   ) {
     const eventToUpdate = await this.eventRepository.findOne({ where: { id } });
     if (!eventToUpdate) {
@@ -80,7 +81,6 @@ export class EventsService {
     eventToUpdate.endTime = endTime ?? eventToUpdate.endTime;
     eventToUpdate.timeDuration = timeDuration ?? eventToUpdate.timeDuration;
     eventToUpdate.entriesCount = entriesCount ?? eventToUpdate.entriesCount;
-    eventToUpdate.photo = photo ?? eventToUpdate.photo;
     return await this.eventRepository.save(eventToUpdate);
   }
 
@@ -109,6 +109,7 @@ export class EventsService {
     if (!eventToDelete) {
       throw new Error('Event not found');
     }
+    await this.eventVisitorRepository.delete({ events: eventToDelete });
     await this.eventRepository.remove(eventToDelete);
     return true;
   }
@@ -135,33 +136,31 @@ export class EventsService {
     });
   }
 
-  async createEventVisitor(QR_code: string, event: Events, visitor: User) {
+  async createEventVisitor(event: Events, visitor: User) {
     const newEventVisitor = this.eventVisitorRepository.create({
-      QR_code,
       events: event,
       visitor,
     });
     return await this.eventVisitorRepository.save(newEventVisitor);
   }
 
-  async updateEventVisitor(id: number, QR_code: string) {
+  async updateEventVisitor(id: number, scanned: number) {
     const eventVisitorToUpdate = await this.eventVisitorRepository.findOne({
       where: { id },
+      relations: ['events', 'events.organizer', 'visitor'],
     });
     if (!eventVisitorToUpdate) {
       throw new Error('Event visitor not found');
     }
-    eventVisitorToUpdate.QR_code = QR_code ?? eventVisitorToUpdate.QR_code;
+    eventVisitorToUpdate.scanned = scanned;
     return await this.eventVisitorRepository.save(eventVisitorToUpdate);
   }
 
-  async deleteEventVisitor(id: number) {
+  async deleteEventVisitor(eventId: number, email: string) {
     const eventVisitorToDelete = await this.eventVisitorRepository.findOne({
-      where: { id },
+      where: { events: { id: eventId }, visitor: { email: email } },
     });
-    if (!eventVisitorToDelete) {
-      throw new Error('Event visitor not found');
-    }
+
     await this.eventVisitorRepository.remove(eventVisitorToDelete);
     return true;
   }
